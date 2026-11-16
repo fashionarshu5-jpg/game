@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Abbey of Silence — 3D Co-op Survival</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Three.js & PeerJS CDNs (No build tools needed for Netlify) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <!-- LOBBY & CHARACTER CUSTOMIZATION SCREEN -->
+  <div id="lobby-screen" class="overlay">
+    <div class="card">
+      <h1>ABBEY OF SILENCE</h1>
+      <p class="subtitle">3D Co-op Survival &amp; Exploration</p>
+
+      <div class="section">
+        <label>1. Choose Character</label>
+        <div class="btn-group">
+          <button id="btn-male" class="select-btn active" onclick="selectGender('male')">Male Explorer</button>
+          <button id="btn-female" class="select-btn" onclick="selectGender('female')">Female Explorer</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>2. Jacket Color</label>
+        <div class="color-row">
+          <button class="color-dot active" style="background:#2b3a42" onclick="selectColor('#2b3a42', this)"></button>
+          <button class="color-dot" style="background:#5c2a2a" onclick="selectColor('#5c2a2a', this)"></button>
+          <button class="color-dot" style="background:#2d4a36" onclick="selectColor('#2d4a36', this)"></button>
+          <button class="color-dot" style="background:#4a3b2c" onclick="selectColor('#4a3b2c', this)"></button>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>3. Play With Your Friend</label>
+        <button id="btn-host" class="primary-btn" onclick="hostGame()">Create Room (Host)</button>
+        <div id="host-info" class="hidden">
+          <p>Share this Room Code with your friend:</p>
+          <div id="room-code-display" class="code-box">----</div>
+          <p class="status-text" id="host-status">Waiting for friend to join...</p>
+        </div>
+
+        <div class="divider">OR</div>
+
+        <div class="join-row">
+          <input type="text" id="join-code-input" maxlength="6" placeholder="ENTER CODE" autocapitalize="characters" />
+          <button id="btn-join" class="secondary-btn" onclick="joinGame()">Join</button>
+        </div>
+        <p class="status-text" id="join-status"></p>
+      </div>
+
+      <button class="ghost-btn" onclick="startSoloPreview()">Test Solo First</button>
+    </div>
+  </div>
+
+  <!-- IN-GAME HUD & MOBILE CONTROLS -->
+  <div id="hud" class="hidden">
+    <div class="top-bar">
+      <div class="stat-pill">Relics: <span id="relic-count">0</span>/5</div>
+      <div class="stat-pill" id="conn-badge">Solo Mode</div>
+      <button id="btn-cam" class="hud-btn" onclick="toggleCamera()">3rd Person</button>
+    </div>
+
+    <div id="toast-msg" class="toast hidden">Find all 5 glowing relics to unlock the Abbey Gate!</div>
+
+    <!-- Left Touch Zone: Virtual Joystick -->
+    <div id="joystick-zone">
+      <div id="joystick-base">
+        <div id="joystick-knob"></div>
+      </div>
+    </div>
+
+    <!-- Right Touch Zone: Camera Swipe -->
+    <div id="look-zone"></div>
+
+    <!-- Action Buttons -->
+    <div class="action-pad">
+      <button id="btn-sprint" class="act-btn">RUN</button>
+      <button id="btn-jump" class="act-btn">JUMP</button>
+      <button id="btn-interact" class="act-btn highlight">GRAB</button>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="win-screen" class="overlay hidden">
+    <div class="card">
+      <h1>SANCTUARY UNLOCKED</h1>
+      <p>You and your partner survived the mist and recovered all 5 relics.</p>
+      <button class="primary-btn" onclick="location.reload()">Play Again</button>
+    </div>
+  </div>
+
+  <canvas id="game-canvas"></canvas>
+  <script src="game.js"></script>
+</body>
+</html>
