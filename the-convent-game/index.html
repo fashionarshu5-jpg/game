@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#08090c" />
+  <meta name="description" content="The Convent — a co-op survival horror escape game." />
+  <title>THE CONVENT — Escape to Survive</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <div id="rotate-screen"><div class="rotate-icon">↻</div><h2>ROTATE YOUR DEVICE</h2><p>THE CONVENT is designed for landscape play.</p></div>
+
+  <main id="lobby-screen" class="overlay lobby">
+    <div class="lobby-art"></div>
+    <div class="lobby-shade"></div>
+    <section class="lobby-panel">
+      <div class="eyebrow"><span class="eyebrow-line"></span> MULTIPLAYER SURVIVAL HORROR <span class="eyebrow-line"></span></div>
+      <h1 class="game-logo">THE CONVEN<span class="cross">T</span></h1>
+      <p class="tagline">ESCAPE TO SURVIVE</p>
+      <p class="intro">Four strangers. One cursed convent. Find the way out before she finds you.</p>
+
+      <div class="lobby-grid">
+        <div class="lobby-section">
+          <div class="section-title"><span>01</span> CHOOSE YOUR SURVIVOR</div>
+          <div class="role-grid">
+            <button class="role-card active" onclick="selectRole('explorer', this)">
+              <span class="role-image explorer-img"></span><b>EXPLORER</b><small>Scout • Backpack</small>
+            </button>
+            <button class="role-card" onclick="selectRole('investigator', this)">
+              <span class="role-image investigator-img"></span><b>INVESTIGATOR</b><small>Search • Clues</small>
+            </button>
+            <button class="role-card" onclick="selectRole('guard', this)">
+              <span class="role-image guard-img"></span><b>GUARD</b><small>Protect • Patrol</small>
+            </button>
+            <button class="role-card" onclick="selectRole('survivor', this)">
+              <span class="role-image survivor-img"></span><b>SURVIVOR</b><small>Adapt • Escape</small>
+            </button>
+          </div>
+          <label class="name-label" for="player-name-input">YOUR CALLSIGN</label>
+          <input id="player-name-input" maxlength="16" value="Harsh" placeholder="Enter callsign" />
+        </div>
+
+        <div class="lobby-section room-section">
+          <div class="section-title"><span>02</span> ENTER THE CONVENT</div>
+          <button class="primary-btn" onclick="hostMultiplayer()">CREATE CO-OP ROOM <span>→</span></button>
+          <div id="host-box" class="host-box hidden">
+            <small>SHARE THIS ROOM CODE</small>
+            <div id="room-code-text" class="room-code">----</div>
+            <p id="host-status">Waiting for your teammate…</p>
+          </div>
+          <div class="or-divider"><span></span> OR JOIN A FRIEND <span></span></div>
+          <div class="join-row">
+            <input id="join-code-input" maxlength="4" placeholder="ROOM CODE" autocomplete="off" />
+            <button class="secondary-btn" onclick="joinMultiplayer()">JOIN</button>
+          </div>
+          <p id="join-status" class="status-text"></p>
+          <button class="solo-btn" onclick="startSoloPlay()">PLAY SOLO <span>↗</span></button>
+          <p class="solo-note">Single player • The Nun is hunting you</p>
+        </div>
+      </div>
+      <div class="lobby-footer"><span>WASD / JOYSTICK TO MOVE</span><span>•</span><span>E / USE TO INTERACT</span><span>•</span><span>STAY QUIET</span></div>
+    </section>
+  </main>
+
+  <div id="hud" class="hidden">
+    <header class="hud-top">
+      <div class="brand-mini">THE <b>CONVEN<span>†</span>T</b></div>
+      <div class="mission"><small>YOUR OBJECTIVE</small><strong id="task-pill">Find the crowbar and chapel key</strong></div>
+      <div class="zone-clock"><span id="hud-zone-label">MAIN HALL</span><b id="game-timer">00:00</b></div>
+      <button id="btn-cam" class="cam-btn" onclick="toggleCamera()">3RD PERSON</button>
+    </header>
+
+    <div class="hud-left">
+      <div class="team-card">
+        <div class="team-title">SURVIVORS <span id="team-count">1/4</span></div>
+        <div class="team-row"><i class="avatar">H</i><span id="hud-local-name">Harsh</span><b class="health"><i></i></b></div>
+        <div id="remote-squad-card" class="team-row hidden"><i class="avatar">+</i><span id="hud-remote-name">Teammate</span><b class="health"><i></i></b></div>
+      </div>
+      <div class="radar-frame"><canvas id="radar-canvas" width="96" height="96"></canvas><small>PROXIMITY RADAR</small></div>
+    </div>
+
+    <div id="danger-vignette" class="hidden"></div>
+    <div id="toast-msg" class="toast hidden"></div>
+    <div id="alert-banner" class="alert-banner info"><span id="alert-icon">!</span><span id="alert-text">Find a way out.</span></div>
+
+    <div id="joystick-zone"><div id="joystick-base"><div id="joystick-knob"></div></div></div>
+    <div id="look-zone"></div>
+
+    <div class="inventory-bar">
+      <div class="inventory-label">INVENTORY</div>
+      <button class="slot active" onclick="selectSlot(0)"><span>🔦</span><small>1</small></button>
+      <button class="slot" onclick="selectSlot(1)"><span id="icon-crowbar">—</span><small>2</small></button>
+      <button class="slot" onclick="selectSlot(2)"><span id="icon-key">—</span><small>3</small></button>
+      <button class="slot" onclick="selectSlot(3)"><span id="icon-cutters">—</span><small>4</small></button>
+    </div>
+
+    <div class="action-pad">
+      <button id="btn-crouch" class="act-btn">CROUCH</button>
+      <button id="btn-sprint" class="act-btn">RUN</button>
+      <button id="btn-jump" class="act-btn">JUMP</button>
+      <button id="btn-interact" class="act-btn highlight">USE</button>
+    </div>
+    <div class="desktop-hint">WASD MOVE <span>•</span> MOUSE LOOK <span>•</span> SHIFT RUN <span>•</span> E USE <span>•</span> C CROUCH</div>
+  </div>
+
+  <div id="caught-screen" class="overlay modal-screen hidden">
+    <div class="modal-card"><div class="modal-kicker">SHE FOUND YOU</div><h2>THE NUN CAUGHT YOU</h2><p>You made too much noise in the convent halls.</p><button class="primary-btn" onclick="respawnInLocker()">ESCAPE LOCKER / RESPAWN</button></div>
+  </div>
+  <div id="win-screen" class="overlay modal-screen hidden">
+    <div class="modal-card win-card"><div class="modal-kicker">YOU SURVIVED</div><h2>YOU ESCAPED THE CONVENT</h2><p>You unlocked the chains and escaped Sister Madeline alive.</p><p class="final-time-label">ESCAPE TIME <b id="final-time">00:00</b></p><button class="primary-btn" onclick="location.reload()">PLAY AGAIN</button></div>
+  </div>
+
+  <canvas id="game-canvas"></canvas>
+  <script src="game.js"></script>
+</body>
+</html>
